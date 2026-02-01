@@ -48,4 +48,8 @@ class User extends Authenticatable
             'closing_date' => 'date',
         ];
     }
+    public function userProfile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
 }
