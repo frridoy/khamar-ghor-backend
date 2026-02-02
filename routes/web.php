@@ -56,10 +56,31 @@ Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->gr
         Route::post('/store', [\App\Http\Controllers\Admin\AdminPostController::class, 'store'])->name('store');
         Route::get('/{post}/view', [\App\Http\Controllers\Admin\AdminPostController::class, 'show'])->name('show');
         Route::delete('/{post}', [\App\Http\Controllers\Admin\AdminPostController::class, 'destroy'])->name('delete');
-        
+
         // AJAX helpers
         Route::get('/get-stores/{userId}', [\App\Http\Controllers\Admin\AdminPostController::class, 'getStores'])->name('get-stores');
         Route::get('/get-attributes/{categoryId}', [\App\Http\Controllers\Admin\AdminPostController::class, 'getAttributes'])->name('get-attributes');
+    });
+
+    Route::prefix('stores')->name('stores.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminStoreController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\AdminStoreController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Admin\AdminStoreController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\AdminStoreController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\AdminStoreController::class, 'update'])->name('update');
+        Route::get('/{id}/view', [\App\Http\Controllers\Admin\AdminStoreController::class, 'show'])->name('show');
+        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\AdminStoreController::class, 'verify'])->name('verify');
+    });
+
+    // Location API Routes
+    Route::get('/divisions/{countryId}', function($countryId) {
+        return response()->json(\App\Models\Division::where('country_id', $countryId)->orderBy('name_en')->get(['id', 'name_en as name']));
+    });
+    Route::get('/districts/{divisionId}', function($divisionId) {
+        return response()->json(\App\Models\District::where('division_id', $divisionId)->orderBy('name_en')->get(['id', 'name_en as name']));
+    });
+    Route::get('/thanas/{districtId}', function($districtId) {
+        return response()->json(\App\Models\Thana::where('district_id', $districtId)->orderBy('name_en')->get(['id', 'name_en as name']));
     });
 });
 
