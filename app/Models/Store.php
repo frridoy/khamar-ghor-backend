@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Store extends Model
 {
     protected $guarded = [];
+    protected $table = 'stores';
 
     public function user()
     {

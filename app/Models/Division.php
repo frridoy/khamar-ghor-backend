@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Division extends Model
 {
     protected $guarded = [];
+    protected $table = 'divisions';
 
     public function country()
     {

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Country extends Model
 {
     protected $guarded = [];
+    protected $table = 'countries';
 
     public function divisions()
     {
