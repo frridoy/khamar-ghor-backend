@@ -49,6 +49,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('admin.posts.index') }}" class="nav-link {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
+                        <i class="fas fa-box-open"></i>
+                        <span>Product Posts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <form action="{{ route('admin.logout') }}" method="POST" id="logout-form" style="display: none;">
                         @csrf
                     </form>

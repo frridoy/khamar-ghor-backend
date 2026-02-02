@@ -49,6 +49,18 @@ Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->gr
             Route::delete('/{attribute}', [\App\Http\Controllers\Admin\AdminCategoryAttributeController::class, 'destroy'])->name('delete');
         });
     });
+
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminPostController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\AdminPostController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Admin\AdminPostController::class, 'store'])->name('store');
+        Route::get('/{post}/view', [\App\Http\Controllers\Admin\AdminPostController::class, 'show'])->name('show');
+        Route::delete('/{post}', [\App\Http\Controllers\Admin\AdminPostController::class, 'destroy'])->name('delete');
+        
+        // AJAX helpers
+        Route::get('/get-stores/{userId}', [\App\Http\Controllers\Admin\AdminPostController::class, 'getStores'])->name('get-stores');
+        Route::get('/get-attributes/{categoryId}', [\App\Http\Controllers\Admin\AdminPostController::class, 'getAttributes'])->name('get-attributes');
+    });
 });
 
 Route::get('/customer/view/{id}', [CustomerController::class, 'show'])->name('admin.customers.show');
