@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Thana extends Model
 {
     protected $guarded = [];
+    protected $table = 'thanas';
 
     public function district()
     {

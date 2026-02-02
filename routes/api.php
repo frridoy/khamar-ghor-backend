@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\StoreController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -24,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/store-user-profile', [UserProfileController::class, 'store']);
     Route::post('/update-user-profile', [UserProfileController::class, 'updateProfile']);
     Route::get('/get-user-profile/{user_id}', [UserProfileController::class, 'getProfile']);
+
+    Route::post('/store-info', [StoreController::class, 'store']);
+    Route::get('/get-store-info/{user_id}', [StoreController::class, 'show']);
 });
 
 Route::controller(LocationController::class)->group(function () {

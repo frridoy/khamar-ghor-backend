@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserProfile extends Model
+class Store extends Model
 {
     protected $guarded = [];
-    protected $table = 'user_profiles';
+    protected $table = 'stores';
 
     public function user()
     {
