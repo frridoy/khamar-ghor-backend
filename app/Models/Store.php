@@ -8,6 +8,9 @@ class Store extends Model
 {
     protected $guarded = [];
     protected $table = 'stores';
+    protected $casts = [
+        'established_date' => 'date',
+    ];
 
     public function user()
     {
