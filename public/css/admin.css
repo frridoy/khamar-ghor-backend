@@ -1,21 +1,22 @@
 :root {
     --primary-color: #6366f1;
     --primary-hover: #4f46e5;
-    --secondary-color: #94a3b8;
-    --bg-color: #f1f5f9;
+    --secondary-color: #64748b;
+    --bg-color: #f8fafc;
     --sidebar-bg: #0f172a;
     --sidebar-text: #94a3b8;
     --sidebar-active: #ffffff;
     --text-primary: #1e293b;
-    --text-secondary: #475569;
+    --text-secondary: #64748b;
     --card-bg: #ffffff;
-    --border-color: #f1f5f9;
+    --border-color: #e2e8f0;
     --success-color: #10b981;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --modal-overlay: rgba(15, 23, 42, 0.7);
 }
 
 * {
@@ -259,13 +260,24 @@ tr:hover {
     color: var(--text-primary);
 }
 
+/* Standard Labels */
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
 .form-control {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
     transition: all 0.2s;
-    background-color: #f8fafc;
+    background-color: #ffffff;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
 }
 
 .form-control:focus {

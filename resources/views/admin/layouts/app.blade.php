@@ -37,6 +37,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->is('admin/categories') || (request()->is('admin/categories/*') && !request()->is('admin/categories/attributes*')) ? 'active' : '' }}">
+                        <i class="fas fa-tags"></i>
+                        <span>Category Mgmt</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.categories.attributes.global') }}" class="nav-link {{ request()->is('admin/categories/attributes*') ? 'active' : '' }}">
+                        <i class="fas fa-list-check"></i>
+                        <span>Attribute Database</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <form action="{{ route('admin.logout') }}" method="POST" id="logout-form" style="display: none;">
                         @csrf
                     </form>
