@@ -77,12 +77,11 @@ class AdminCategoryAttributeController extends Controller
         DB::beginTransaction();
         try {
             $submittedIds = [];
-            
+
             foreach ($attributesData as $data) {
                 $isRequired = isset($data['is_required']) && ($data['is_required'] === 'on' || $data['is_required'] == 1);
-                
+
                 if (isset($data['id']) && !empty($data['id'])) {
-                    // Update existing
                     $attribute = $category->attributes()->findOrFail($data['id']);
                     $attribute->update([
                         'name' => $data['name'],
@@ -95,7 +94,6 @@ class AdminCategoryAttributeController extends Controller
                     ]);
                     $submittedIds[] = $attribute->id;
                 } else {
-                    // Create new
                     $newAttr = $category->attributes()->create([
                         'name' => $data['name'],
                         'slug' => Str::slug($data['name']),
@@ -109,8 +107,6 @@ class AdminCategoryAttributeController extends Controller
                     $submittedIds[] = $newAttr->id;
                 }
             }
-
-            // Sync: Delete attributes not in submitted list
             $category->attributes()->whereNotIn('id', $submittedIds)->delete();
 
             DB::commit();
@@ -149,7 +145,7 @@ class AdminCategoryAttributeController extends Controller
                 if (empty($attr['name'])) continue;
 
                 $isRequired = isset($attr['is_required']) && ($attr['is_required'] === 'on' || $attr['is_required'] == 1);
-                
+
                 $category->attributes()->create([
                     'name' => $attr['name'],
                     'slug' => Str::slug($attr['name']),

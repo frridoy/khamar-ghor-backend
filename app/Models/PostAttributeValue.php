@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PostAttributeValue extends Model
 {
     use HasFactory;
+    protected $table = 'post_attribute_values';
 
     protected $fillable = [
         'post_id',

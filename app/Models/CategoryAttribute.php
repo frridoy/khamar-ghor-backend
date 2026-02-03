@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class CategoryAttribute extends Model
 {
     use HasFactory;
+    protected $table = 'category_attributes';
 
     protected $fillable = [
         'category_id',

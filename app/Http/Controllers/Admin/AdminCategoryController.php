@@ -54,7 +54,7 @@ class AdminCategoryController extends Controller
                 $file = $request->file('image');
                 $extension = $file->getClientOriginalExtension();
                 $fileName = $category->id . '_category_' . rand(1000, 9999) . '.' . $extension;
-                
+
                 $path = $file->storeAs('categories', $fileName, 'public');
                 $category->update(['image' => $path]);
             }
@@ -84,7 +84,6 @@ class AdminCategoryController extends Controller
         $data['is_updated'] = true;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
@@ -92,7 +91,7 @@ class AdminCategoryController extends Controller
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
             $fileName = $category->id . '_category_' . rand(1000, 9999) . '.' . $extension;
-            
+
             $data['image'] = $file->storeAs('categories', $fileName, 'public');
         }
 
