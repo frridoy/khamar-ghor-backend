@@ -224,7 +224,6 @@ class AdminPostController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update core post
             $post->update($request->only([
                 'user_id',
                 'store_id',
@@ -236,10 +235,8 @@ class AdminPostController extends Controller
                 'credit_cost',
             ]));
 
-            /** 🔹 Attribute Sync */
             $attributes = $request->input('attributes', []);
 
-            // Delete old values first (safe + clean)
             PostAttributeValue::where('post_id', $post->id)->delete();
 
             foreach ($attributes as $attributeId => $value) {
@@ -252,7 +249,6 @@ class AdminPostController extends Controller
                 }
             }
 
-            /** 🔹 Images (append new, don’t delete old automatically) */
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
                     if ($image) {
@@ -269,7 +265,6 @@ class AdminPostController extends Controller
                 }
             }
 
-            /** 🔹 Video replace (optional) */
             if ($request->hasFile('video')) {
                 PostMedia::where('post_id', $post->id)
                     ->where('type', 'video')
