@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\SystemSetting;
+use App\Models\UserCredit;
+use App\Models\CreditTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -51,16 +55,45 @@ class CustomerController extends Controller
             'user_role' => 'required|integer',
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'password' => Hash::make($request->password),
-            'user_role' => $request->user_role,
-            'is_active' => 1,
-        ]);
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'password' => Hash::make($request->password),
+                'user_role' => $request->user_role,
+                'is_active' => 1,
+            ]);
 
-        return redirect()->route('admin.customers.index')->with('success', 'User created successfully.');
+            $systemSetting = SystemSetting::latest()->first();
+            $freeCredits = ($systemSetting && $systemSetting->free_credits_on_signup)
+                ? $systemSetting->free_credits_on_signup
+                : 0;
+
+            UserCredit::create([
+                'user_id' => $user->id,
+                'total_earned' => $freeCredits,
+                'total_spent' => 0,
+                'balance_credit' => $freeCredits,
+            ]);
+
+            CreditTransaction::create([
+                'user_id' => $user->id,
+                'type' => 'earn',
+                'source' => 'signup',
+                'reference_id' => null,
+                'credits' => $freeCredits,
+                'balance_before' => 0,
+                'balance_after' => $freeCredits,
+            ]);
+
+            DB::commit();
+            return redirect()->route('admin.customers.index')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to create user. Please try again.');
+        }
     }
 
     public function edit($id)
@@ -72,7 +105,7 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,

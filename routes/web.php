@@ -16,6 +16,15 @@ Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin
 Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+    // System Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'store'])->name('store');
+        Route::get('/{setting}', [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'show'])->name('show');
+        Route::put('/{setting}', [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'update'])->name('update');
+    });
+
     Route::prefix('customer')->name('customers.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
         Route::get('/create', [CustomerController::class, 'create'])->name('create');
