@@ -61,6 +61,7 @@ Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->gr
 
     Route::prefix('posts')->name('posts.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminPostController::class, 'index'])->name('index');
+        Route::get('/media', [\App\Http\Controllers\Admin\AdminPostController::class, 'media'])->name('media');
         Route::get('/create', [\App\Http\Controllers\Admin\AdminPostController::class, 'create'])->name('create');
         Route::post('/store', [\App\Http\Controllers\Admin\AdminPostController::class, 'store'])->name('store');
         Route::get('/{post}/view', [\App\Http\Controllers\Admin\AdminPostController::class, 'show'])->name('show');

@@ -50,9 +50,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.posts.index') }}" class="nav-link {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.posts.index') }}" class="nav-link {{ request()->routeIs('admin.posts.*') && !request()->routeIs('admin.posts.media') ? 'active' : '' }}">
                         <i class="fas fa-box-open"></i>
                         <span>Product Posts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.posts.media') }}" class="nav-link {{ request()->routeIs('admin.posts.media') ? 'active' : '' }}">
+                        <i class="fas fa-photo-video"></i>
+                        <span>Post Media</span>
                     </a>
                 </li>
                 <li class="nav-item">

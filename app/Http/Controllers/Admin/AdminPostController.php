@@ -187,4 +187,28 @@ class AdminPostController extends Controller
         $post->load(['user', 'store', 'category', 'attributeValues.attribute', 'media']);
         return view('admin.posts.view-modal', compact('post'));
     }
+
+    public function media(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+
+        $query = Post::with(['user', 'store', 'media', 'category'])->orderBy('id', 'desc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('user', function($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('store', function($qs) use ($search) {
+                        $qs->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $posts = $query->paginate($perPage)->withQueryString();
+
+        return view('admin.posts.media', compact('posts', 'perPage', 'search'));
+    }
 }
