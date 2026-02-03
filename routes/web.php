@@ -64,6 +64,8 @@ Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->gr
         Route::get('/media', [\App\Http\Controllers\Admin\AdminPostController::class, 'media'])->name('media');
         Route::get('/create', [\App\Http\Controllers\Admin\AdminPostController::class, 'create'])->name('create');
         Route::post('/store', [\App\Http\Controllers\Admin\AdminPostController::class, 'store'])->name('store');
+        Route::get('/{post}/edit', [\App\Http\Controllers\Admin\AdminPostController::class, 'edit'])->name('edit');
+        Route::put('/{post}', [\App\Http\Controllers\Admin\AdminPostController::class, 'update'])->name('update');
         Route::get('/{post}/view', [\App\Http\Controllers\Admin\AdminPostController::class, 'show'])->name('show');
         Route::delete('/{post}', [\App\Http\Controllers\Admin\AdminPostController::class, 'destroy'])->name('delete');
 
@@ -83,13 +85,13 @@ Route::middleware(['auth', 'admin_access'])->prefix('admin')->name('admin.')->gr
     });
 
     // Location API Routes
-    Route::get('/divisions/{countryId}', function($countryId) {
+    Route::get('/divisions/{countryId}', function ($countryId) {
         return response()->json(\App\Models\Division::where('country_id', $countryId)->orderBy('name_en')->get(['id', 'name_en as name']));
     });
-    Route::get('/districts/{divisionId}', function($divisionId) {
+    Route::get('/districts/{divisionId}', function ($divisionId) {
         return response()->json(\App\Models\District::where('division_id', $divisionId)->orderBy('name_en')->get(['id', 'name_en as name']));
     });
-    Route::get('/thanas/{districtId}', function($districtId) {
+    Route::get('/thanas/{districtId}', function ($districtId) {
         return response()->json(\App\Models\Thana::where('district_id', $districtId)->orderBy('name_en')->get(['id', 'name_en as name']));
     });
 });

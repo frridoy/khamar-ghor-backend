@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
 use App\Models\Category;
-use App\Models\User;
-use App\Models\Store;
+use App\Models\CategoryAttribute;
+use App\Models\Post;
 use App\Models\PostAttributeValue;
 use App\Models\PostMedia;
-use App\Models\CategoryAttribute;
+use App\Models\Store;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AdminPostController extends Controller
 {
@@ -98,7 +99,7 @@ class AdminPostController extends Controller
             'discount_price' => 'nullable|numeric|min:0',
             'credit_cost' => 'nullable|numeric|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'video' => 'nullable|mimes:mp4,mov,avi,wmv|max:20480', 
+            'video' => 'nullable|mimes:mp4,mov,avi,wmv|max:20480',
         ]);
 
         DB::beginTransaction();
@@ -173,6 +174,128 @@ class AdminPostController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        $post = Post::with([
+            'attributeValues',
+            'media'
+        ])->findOrFail($id);
+
+        $users = User::all();
+        $stores = Store::where('user_id', $post->user_id)->get();
+        $categories = Category::all();
+
+        $attributeValues = $post->attributeValues
+            ->pluck('value', 'attribute_id')
+            ->toArray();
+
+        return view('admin.posts.edit', compact(
+            'post',
+            'users',
+            'stores',
+            'categories',
+            'attributeValues'
+        ));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $post = Post::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'store_id' => 'required|exists:stores,id',
+            'category_id' => 'required|exists:categories,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'original_price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'credit_cost' => 'nullable|numeric|min:0',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'video' => 'nullable|mimes:mp4,mov,avi,wmv|max:20480',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Update core post
+            $post->update($request->only([
+                'user_id',
+                'store_id',
+                'category_id',
+                'title',
+                'description',
+                'original_price',
+                'discount_price',
+                'credit_cost',
+            ]));
+
+            /** 🔹 Attribute Sync */
+            $attributes = $request->input('attributes', []);
+
+            // Delete old values first (safe + clean)
+            PostAttributeValue::where('post_id', $post->id)->delete();
+
+            foreach ($attributes as $attributeId => $value) {
+                if ($value !== null && $value !== '') {
+                    PostAttributeValue::create([
+                        'post_id' => $post->id,
+                        'attribute_id' => $attributeId,
+                        'value' => is_array($value) ? json_encode($value) : $value,
+                    ]);
+                }
+            }
+
+            /** 🔹 Images (append new, don’t delete old automatically) */
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    if ($image) {
+                        $path = $image->store('posts/images', 'public');
+
+                        PostMedia::create([
+                            'post_id' => $post->id,
+                            'file_path' => $path,
+                            'type' => 'image',
+                            'position' => $index,
+                            'is_primary' => false,
+                        ]);
+                    }
+                }
+            }
+
+            /** 🔹 Video replace (optional) */
+            if ($request->hasFile('video')) {
+                PostMedia::where('post_id', $post->id)
+                    ->where('type', 'video')
+                    ->delete();
+
+                $path = $request->file('video')->store('posts/videos', 'public');
+
+                PostMedia::create([
+                    'post_id' => $post->id,
+                    'file_path' => $path,
+                    'type' => 'video',
+                    'position' => 0,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.posts.index')
+                ->with('success', 'Post updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
     public function destroy(Post $post)
     {
         foreach ($post->media as $media) {
@@ -198,10 +321,10 @@ class AdminPostController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('user', function($qu) use ($search) {
+                    ->orWhereHas('user', function ($qu) use ($search) {
                         $qu->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('store', function($qs) use ($search) {
+                    ->orWhereHas('store', function ($qs) use ($search) {
                         $qs->where('name', 'like', "%{$search}%");
                     });
             });
